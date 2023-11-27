@@ -22,6 +22,8 @@ export default function Page({ params }) {
   //state variable to set remote socket id  and stream
   const [remoteSocketId, setRemoteSocketId] = useState(null);
   const [remoteStream, setRemoteStream] = useState();
+  const [isCallDone, setIsCallDone] = useState(false);
+  const [isStreamSent, setIsStreamSent] = useState(false);
 
   useEffect(() => {
     console.log(peer);
@@ -41,7 +43,7 @@ export default function Page({ params }) {
   }
 
   //function to handle user joined
-  const handleUserJoined = useCallback(({ email, id }) => {
+  const handleUserJoined = useCallback(({ name, id }) => {
     setRemoteSocketId(id);
   }, []);
 
@@ -54,6 +56,7 @@ export default function Page({ params }) {
     const offer = await peer.getOffer();
     socket.emit("user:call", { to: remoteSocketId, offer });
     setMyStream(stream);
+    setIsCallDone(true);
   }, [remoteSocketId, socket]);
 
   //function to handle incoming call
@@ -72,6 +75,7 @@ export default function Page({ params }) {
       for (const track of myStream.getTracks()) {
         peer.peer.addTrack(track, myStream);
       }
+      setIsStreamSent(true);
     }
   }, [myStream]);
 
@@ -119,11 +123,11 @@ export default function Page({ params }) {
 
   const toggleMute = () => {
     socket.emit("call:mute", { to: remoteSocketId });
-    setRemoteMute((state) => !state);
+    
   };
 
   const handleRemoteCallMuted = useCallback(async ({ from }) => {
-    // setRemoteMute(state => !state)
+    setRemoteMute((state) => !state);
   }, []);
 
   //useeffect for user:joined and incoming call
@@ -133,7 +137,6 @@ export default function Page({ params }) {
     socket.on("call:accepted", handleCallAccepted);
     socket.on("peer:nego:needed", handleNegoNeedIncoming);
     socket.on("peer:nego:final", handleNegoNeedFinal);
-    socket.on("call:muted", handleRemoteCallMuted);
 
     return () => {
       socket.off("user:joined", handleUserJoined);
@@ -154,48 +157,59 @@ export default function Page({ params }) {
 
   return (
     <div className="flex flex-col flex-1 items-center   ">
-      <h1 className="text-6xl text-white font-bold mt-16 ">
+      <h1 className="lg:text-4xl text-white font-bold mt-16 md:text-3xl sm:mt-8 sm:text-xl  ">
         Room Number - {roomNumber}
       </h1>
-      <div className="mt-10 flex flex-col items-center">
-        <h4 className=" text-2xl   ">
-          {remoteSocketId ? "Connected" : "There is  no one in room"}
+      <div className="lg:mt-10  md:mt-8  flex flex-col items-center">
+        <h4 className=" lg:text-2xl mb-4  md:text-xl sm:text-base ">
+          {remoteSocketId
+            ? "Someone has joined"
+            : "Looks like you are alone here !"}
         </h4>
-        {remoteSocketId && (
-          <button
-            style={{ background: "white", color: "black" }}
-            onClick={sendStreams}
-          >
-            Send Stream
-          </button>
-        )}
-        {remoteSocketId && (
-          <button
-            style={{ background: "white", color: "black" }}
-            onClick={handleCallUser}
-          >
-            CALL
-          </button>
+        {!isStreamSent && (
+          <div className="flex">
+            {remoteSocketId && (
+              <button
+                style={{ background: "white", color: "black" }}
+                onClick={handleCallUser}
+                className="  text-white text-xl rounded-xl  px-8 py-4 flex items-center mx-4"
+              >
+                CALL
+              </button>
+            )}
+            {remoteSocketId && isCallDone && (
+              <button
+                style={{ background: "white", color: "black" }}
+                onClick={sendStreams}
+                className="bg-gradient-to-r  text-white text-xl rounded-xl from-[#1E59F0] to-[#b23ab4]  px-8 py-4 flex items-center"
+              >
+                Send Stream
+              </button>
+            )}
+          </div>
         )}
       </div>
-      <div className="flex mt-6">
+
+      {/* container for video display */}
+      <div className="lg:flex lg:mt-12   sm:block md:mt-4">
         {myStream && (
-          <div>
-            <h1 className="text-white text-xl">My Video</h1>
+          <div className="block sm:flex sm:flex-col sm:items-center ">
+            <h1 className="text-white   lg:text-3xl md:text-xl sm:text-base mb-4 ">My Video</h1>
             <ReactPlayer
-              style={{ borderWidth: 1, borderColor: "white" }}
+              className="border-2 border-white w-1/2"
               playing={streamPlay}
               muted
-              height={488}
-              width={650}
+              width={"100%"}
+              height={"70%"}
               url={myStream}
               ref={playerRef}
             />
-            <div>
+
+            <div className="mt-6">
               <button
                 style={{
-                  height: 20,
-                  width: 20,
+                  height: 10,
+                  width: 10,
                 }}
                 onClick={toggleMute}
               >
@@ -215,15 +229,14 @@ export default function Page({ params }) {
         )}
 
         {remoteStream && (
-          <div className="mx-4">
-            <h1 className="text-white text-xl">Remote Stream</h1>
-            {console.log("This is ", remoteMute)}
+          <div className=" lg:mx-4">
+            <h1 className="text-white   lg:text-3xl md:text-xl sm:text-base mb-4">Remote Stream</h1>
             <ReactPlayer
-              style={{ borderWidth: 1, borderColor: "white" }}
+              className="border-2 border-white w-1/2"
               playing
               muted={remoteMute}
-              height={488}
-              width={650}
+              width={"100%"}
+              height={"70%"}
               url={remoteStream}
             />
           </div>

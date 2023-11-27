@@ -25,6 +25,7 @@ export default function Page() {
           strokeWidth={1.5}
           stroke="currentColor"
           className="w-8 h-8 ml-4"
+          
         >
           <path
             strokeLinecap="round"
