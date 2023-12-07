@@ -24,15 +24,17 @@ export default function Page({ params }) {
   const [remoteStream, setRemoteStream] = useState();
   const [isCallDone, setIsCallDone] = useState(false);
   const [isStreamSent, setIsStreamSent] = useState(false);
+  
+  //boolean to handle user mute
+  const [isUserMute, setIsUserMute] = useState(false)
+  //boolean to handle user Video 
+  const [isUserVisible, setIsUserVisible] = useState(true)
 
-  useEffect(() => {
-    console.log(peer);
-  }, []);
   //variable to store userStream
   const [myStream, setMyStream] = useState();
-
-  const [streamPlay, setStreamPlay] = useState(true);
   const [remoteMute, setRemoteMute] = useState(false);
+    //boolean to handle remote user Video 
+    const [isRemoteVisible, setIsRemoteVisible] = useState(true)
 
   async function getMyStream(audio) {
     const stream = await navigator.mediaDevices.getUserMedia({
@@ -122,13 +124,18 @@ export default function Page({ params }) {
   }, []);
 
   const toggleMute = () => {
+    setIsUserMute(state => !state)
     socket.emit("call:mute", { to: remoteSocketId });
-    
   };
 
   const handleRemoteCallMuted = useCallback(async ({ from }) => {
     setRemoteMute((state) => !state);
   }, []);
+
+  const handleRemoteVideoStopped = useCallback(async ({ from }) => {
+    setIsRemoteVisible(state => !state)
+  }, []);
+  
 
   //useeffect for user:joined and incoming call
   useEffect(() => {
@@ -137,6 +144,9 @@ export default function Page({ params }) {
     socket.on("call:accepted", handleCallAccepted);
     socket.on("peer:nego:needed", handleNegoNeedIncoming);
     socket.on("peer:nego:final", handleNegoNeedFinal);
+    socket.on("call:muted", handleRemoteCallMuted);
+    socket.on("video:stoped", handleRemoteVideoStopped);
+    
 
     return () => {
       socket.off("user:joined", handleUserJoined);
@@ -144,6 +154,8 @@ export default function Page({ params }) {
       socket.off("call:accepted", handleCallAccepted);
       socket.off("peer:nego:needed", handleNegoNeedIncoming);
       socket.off("peer:nego:final", handleNegoNeedFinal);
+      socket.off("call:muted", handleRemoteCallMuted);
+      socket.off("video:stoped", handleRemoteVideoStopped);
     };
   }, [
     socket,
@@ -153,6 +165,7 @@ export default function Page({ params }) {
     handleNegoNeedIncoming,
     handleNegoNeedFinal,
     handleRemoteCallMuted,
+    handleRemoteVideoStopped
   ]);
 
   return (
@@ -197,7 +210,7 @@ export default function Page({ params }) {
             <h1 className="text-white   lg:text-3xl md:text-xl sm:text-base mb-4 ">My Video</h1>
             <ReactPlayer
               className="border-2 border-white w-1/2"
-              playing={streamPlay}
+              playing={isUserVisible}
               muted
               width={"100%"}
               height={"70%"}
@@ -213,16 +226,17 @@ export default function Page({ params }) {
                 }}
                 onClick={toggleMute}
               >
-                {remoteMute ? mute : unmute}
+                {isUserMute ? mute : unmute}
               </button>
 
               <button
                 className="ml-16"
                 onClick={() => {
-                  setStreamPlay((streamPlay) => !streamPlay);
+                  setIsUserVisible(state => !state)
+                  socket.emit("video:stop", { to: remoteSocketId });
                 }}
               >
-                {streamPlay ? videoOn : videoOff}
+                {isUserVisible ? videoOn : videoOff}
               </button>
             </div>
           </div>
@@ -233,7 +247,7 @@ export default function Page({ params }) {
             <h1 className="text-white   lg:text-3xl md:text-xl sm:text-base mb-4">Remote Stream</h1>
             <ReactPlayer
               className="border-2 border-white w-1/2"
-              playing
+              playing = {isRemoteVisible}
               muted={remoteMute}
               width={"100%"}
               height={"70%"}
