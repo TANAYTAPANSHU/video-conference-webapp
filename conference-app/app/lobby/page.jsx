@@ -39,8 +39,6 @@ function Page() {
 
   useEffect(() => {
     socket.on("room:join", (data) => {
-      console.log(`Data from server`, data);
-      console.log("This si the room ", roomNumberRef.current);
       router.push(`/videoRoom/${roomNumberRef.current}`);
     });
     socket.on("user:joined", (data) => {

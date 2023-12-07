@@ -10,7 +10,7 @@ export const useSocket = () =>{
 }
 
 function SocketProvider(props) {
-    const socket = useMemo(()=> io("localhost:5001"),[])
+    const socket = useMemo(()=> io("https://video-conference-server.onrender.com"),[])
   return (
     <SocketContext.Provider value={socket} >
         {props.children}
