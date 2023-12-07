@@ -40,21 +40,18 @@ To run Samvad Connect locally, follow these steps:
 
 ## Usage
 
-1. **Sign Up:**
-   - Users need to sign up with a unique username to start using Samvad Connect.
+1. **Fill the form:**
+   - Users need to fill the form and input the video room number.
 
-2. **Make a Call:**
-   - After signing in, users can initiate anonymous calls by entering the username of the person they want to connect with.
+2. **Wait for another user to join the room:**
 
-3. **Choose to share your stream:**
-   - Users can choose to share your stream, ensuring control over their communication.
+3. **Send the call**
 
-4. **End the Call:**
-   - Either party can end the call at any time by clicking the "End Call" button.
+4. **Mute your video, audio**
 
 ## Configuration
 
-- WebRTC settings and other configurations can be adjusted in the `config.js` file.
+- WebRTC settings and other configurations can be adjusted in the `peer.js` file.
 
 
 ## Issues and Support
