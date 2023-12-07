@@ -4,6 +4,11 @@
 
 Welcome to Samvad Connect, a WebRTC-based web application built using Next.js. Samvad Connect allows users to make anonymous calls with one another, enabling secure and private communication without revealing personal information.
 
+## Project Screnshots
+![Landing Page](https://firebasestorage.googleapis.com/v0/b/instagram-clone-71729.appspot.com/o/images%2Fsamvad1.png?alt=media&token=b6c2fd0d-cdab-42e0-bb09-1185c17ec012)
+![Lobby Page](https://firebasestorage.googleapis.com/v0/b/instagram-clone-71729.appspot.com/o/images%2Fsamvad2.png?alt=media&token=4121ce4f-4941-44d0-bada-045542f290a7)
+![Video Room](https://firebasestorage.googleapis.com/v0/b/instagram-clone-71729.appspot.com/o/images%2Fsamvad3.png?alt=media&token=4c1eddbe-33c9-4326-8ac9-b4bc5466b25c)
+
 ## Features
 
 - **Anonymous Calls:** Users can make calls to others without disclosing their identity or personal details.
